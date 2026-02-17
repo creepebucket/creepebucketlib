@@ -19,7 +19,15 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v3
-      - run: chmod +x gradlew
-      - run: ./gradlew -q publish
+      - name: debug_workspace
+        run: |
+          echo "pwd=$(pwd)"
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          echo "GITHUB_REF=$GITHUB_REF"
+          git rev-parse HEAD || true
+          ls -la
+          ls -la "$GITHUB_WORKSPACE"
+      - run: chmod +x "$GITHUB_WORKSPACE/gradlew"
+      - run: "$GITHUB_WORKSPACE/gradlew" -q publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
