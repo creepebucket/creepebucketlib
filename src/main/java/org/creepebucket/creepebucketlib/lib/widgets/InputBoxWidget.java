@@ -7,10 +7,10 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import org.creepebucket.programmable_magic.client.ClientUiContext;
-import org.creepebucket.programmable_magic.gui.lib.api.Coordinate;
-import org.creepebucket.programmable_magic.gui.lib.api.Widget;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.*;
+import org.creepebucket.creepebucketlib.client.ClientUiContext;
+import org.creepebucket.creepebucketlib.lib.api.Coordinate;
+import org.creepebucket.creepebucketlib.lib.api.Widget;
+import org.creepebucket.creepebucketlib.lib.api.widgets.*;
 import org.jspecify.annotations.Nullable;
 
 public class InputBoxWidget extends Widget implements Renderable, Clickable, KeyInputable, MouseDraggable, Lifecycle {
@@ -121,4 +121,3 @@ public class InputBoxWidget extends Widget implements Renderable, Clickable, Key
         }
     }
 }
-

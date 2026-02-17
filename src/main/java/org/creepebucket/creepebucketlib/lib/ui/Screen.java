@@ -13,9 +13,17 @@ import net.minecraft.world.entity.player.Inventory;
 import org.creepebucket.creepebucketlib.client.ClientUiContext;
 import org.creepebucket.creepebucketlib.dataPackets.HookTriggerPacket;
 import org.creepebucket.creepebucketlib.dataPackets.SimpleKvPacket;
+import org.creepebucket.creepebucketlib.lib.api.ClientSlotManager;
 import org.creepebucket.creepebucketlib.lib.api.Coordinate;
 import org.creepebucket.creepebucketlib.lib.api.SlotManipulationScreen;
 import org.creepebucket.creepebucketlib.lib.api.Widget;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Clickable;
+import org.creepebucket.creepebucketlib.lib.api.widgets.KeyInputable;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Lifecycle;
+import org.creepebucket.creepebucketlib.lib.api.widgets.MouseDraggable;
+import org.creepebucket.creepebucketlib.lib.api.widgets.MouseScrollable;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Tickable;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Tooltipable;
 
 import java.util.List;
 

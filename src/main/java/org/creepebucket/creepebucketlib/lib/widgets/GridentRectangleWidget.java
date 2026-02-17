@@ -1,11 +1,11 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
-import org.creepebucket.programmable_magic.gui.lib.api.Animation;
-import org.creepebucket.programmable_magic.gui.lib.api.Color;
-import org.creepebucket.programmable_magic.gui.lib.api.Coordinate;
-import org.creepebucket.programmable_magic.gui.lib.api.Widget;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.Renderable;
+import org.creepebucket.creepebucketlib.lib.api.Animation;
+import org.creepebucket.creepebucketlib.lib.api.Color;
+import org.creepebucket.creepebucketlib.lib.api.Coordinate;
+import org.creepebucket.creepebucketlib.lib.api.Widget;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
 
 public class GridentRectangleWidget extends Widget implements Renderable {
     public boolean vertical;

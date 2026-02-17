@@ -1,9 +1,9 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
-import org.creepebucket.programmable_magic.gui.lib.api.Coordinate;
-import org.creepebucket.programmable_magic.gui.lib.api.SmoothedValue;
-import org.creepebucket.programmable_magic.gui.lib.api.Widget;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.MouseScrollable;
+import org.creepebucket.creepebucketlib.lib.api.Coordinate;
+import org.creepebucket.creepebucketlib.lib.api.SmoothedValue;
+import org.creepebucket.creepebucketlib.lib.api.Widget;
+import org.creepebucket.creepebucketlib.lib.api.widgets.MouseScrollable;
 
 /**
  * 滚动区域控件：在指定区域内响应鼠标滚轮事件，更新滚动值。

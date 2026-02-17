@@ -7,7 +7,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
 import static org.creepebucket.creepebucketlib.Creepebucketlib.MODID;
-import static org.creepebucket.programmable_magic.Programmable_magic.MODID;
 
 /**
  * 从客户端 Screen 向服务器端当前菜单传递一个键值对（k=string, v=object）。

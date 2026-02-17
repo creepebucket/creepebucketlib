@@ -3,13 +3,13 @@ package org.creepebucket.creepebucketlib.lib.widgets;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.util.Mth;
-import org.creepebucket.programmable_magic.gui.lib.api.Color;
-import org.creepebucket.programmable_magic.gui.lib.api.Coordinate;
-import org.creepebucket.programmable_magic.gui.lib.api.SmoothedValue;
-import org.creepebucket.programmable_magic.gui.lib.api.Widget;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.Clickable;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.MouseDraggable;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.Renderable;
+import org.creepebucket.creepebucketlib.lib.api.Color;
+import org.creepebucket.creepebucketlib.lib.api.Coordinate;
+import org.creepebucket.creepebucketlib.lib.api.SmoothedValue;
+import org.creepebucket.creepebucketlib.lib.api.Widget;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Clickable;
+import org.creepebucket.creepebucketlib.lib.api.widgets.MouseDraggable;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
 
 public class ScrollbarWidget extends Widget implements MouseDraggable, Clickable, Renderable {
 

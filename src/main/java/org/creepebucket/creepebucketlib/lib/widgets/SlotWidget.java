@@ -2,11 +2,11 @@ package org.creepebucket.creepebucketlib.lib.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.inventory.Slot;
-import org.creepebucket.programmable_magic.gui.lib.api.ClientSlotManager;
-import org.creepebucket.programmable_magic.gui.lib.api.Coordinate;
-import org.creepebucket.programmable_magic.gui.lib.api.Widget;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.Lifecycle;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.Renderable;
+import org.creepebucket.creepebucketlib.lib.api.ClientSlotManager;
+import org.creepebucket.creepebucketlib.lib.api.Coordinate;
+import org.creepebucket.creepebucketlib.lib.api.Widget;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Lifecycle;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
 
 /**
  * 槽位控件：每 tick 将 {@link Slot} 的客户端坐标同步到 {@link ClientSlotManager}。

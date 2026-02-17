@@ -1,11 +1,11 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
 import net.minecraft.client.input.MouseButtonEvent;
-import org.creepebucket.programmable_magic.gui.lib.api.Coordinate;
-import org.creepebucket.programmable_magic.gui.lib.api.Widget;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.Clickable;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.Lifecycle;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.MouseDraggable;
+import org.creepebucket.creepebucketlib.lib.api.Coordinate;
+import org.creepebucket.creepebucketlib.lib.api.Widget;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Clickable;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Lifecycle;
+import org.creepebucket.creepebucketlib.lib.api.widgets.MouseDraggable;
 
 public class SlideBarWidget extends Widget implements MouseDraggable, Clickable, Lifecycle {
     public boolean focus = true;

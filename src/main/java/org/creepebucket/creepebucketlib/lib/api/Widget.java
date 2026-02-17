@@ -2,15 +2,15 @@ package org.creepebucket.creepebucketlib.lib.api;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.Lifecycle;
-import org.creepebucket.programmable_magic.gui.lib.api.widgets.Renderable;
-import org.creepebucket.programmable_magic.gui.lib.ui.Menu;
-import org.creepebucket.programmable_magic.gui.lib.ui.Screen;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Lifecycle;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
+import org.creepebucket.creepebucketlib.lib.ui.Menu;
+import org.creepebucket.creepebucketlib.lib.ui.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.creepebucket.programmable_magic.ModUtils.now;
+import static org.creepebucket.creepebucketlib.ModUtils.now;
 
 /**
  * UI 控件基类：提供位置和尺寸的基础支持，通过实现功能接口来获得能力。

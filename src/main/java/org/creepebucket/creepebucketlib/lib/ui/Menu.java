@@ -8,14 +8,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
-import org.creepebucket.programmable_magic.gui.lib.api.DataManager;
-import org.creepebucket.programmable_magic.gui.lib.api.SyncMode;
-import org.creepebucket.programmable_magic.gui.lib.api.SyncedValue;
-import org.creepebucket.programmable_magic.gui.lib.api.hooks.Hook;
-import org.creepebucket.programmable_magic.gui.lib.api.hooks.HookManager;
-import org.creepebucket.programmable_magic.network.dataPackets.SimpleKvC2SHandler;
-import org.creepebucket.programmable_magic.network.dataPackets.SimpleKvS2CHandler;
-import org.creepebucket.programmable_magic.network.dataPackets.SimpleKvS2cPacket;
+import org.creepebucket.creepebucketlib.dataPackets.SimpleKvC2SHandler;
+import org.creepebucket.creepebucketlib.dataPackets.SimpleKvS2CHandler;
+import org.creepebucket.creepebucketlib.dataPackets.SimpleKvS2cPacket;
+import org.creepebucket.creepebucketlib.lib.api.DataManager;
+import org.creepebucket.creepebucketlib.lib.api.SyncMode;
+import org.creepebucket.creepebucketlib.lib.api.SyncedValue;
+import org.creepebucket.creepebucketlib.lib.api.hooks.Hook;
+import org.creepebucket.creepebucketlib.lib.api.hooks.HookManager;
 
 public abstract class Menu extends AbstractContainerMenu implements SimpleKvC2SHandler, SimpleKvS2CHandler {
 

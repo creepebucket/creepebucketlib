@@ -6,7 +6,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-import static org.creepebucket.programmable_magic.Programmable_magic.MODID;
+import static org.creepebucket.creepebucketlib.Creepebucketlib.MODID;
 
 public record SimpleKvS2cPacket(String key, Object value) implements CustomPacketPayload {
 
@@ -33,4 +33,3 @@ public record SimpleKvS2cPacket(String key, Object value) implements CustomPacke
         return TYPE;
     }
 }
-
