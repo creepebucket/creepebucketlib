@@ -28,6 +28,6 @@ jobs:
           ls -la
           ls -la "$GITHUB_WORKSPACE"
       - run: chmod +x "$GITHUB_WORKSPACE/gradlew"
-      - run: "$GITHUB_WORKSPACE/gradlew" -q publish
+      - run: $GITHUB_WORKSPACE/gradlew -q publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
