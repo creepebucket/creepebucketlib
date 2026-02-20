@@ -21,6 +21,7 @@ import java.util.List;
 public class SelectableImageButtonWidget extends Widget implements Renderable, Clickable, Tooltipable {
     private final Identifier normal;
     public boolean isSelected = false;
+    public Runnable onClick;
     private Identifier selected;
 
     public SelectableImageButtonWidget(Coordinate pos, Coordinate size, Identifier texture) {
@@ -31,6 +32,11 @@ public class SelectableImageButtonWidget extends Widget implements Renderable, C
 
     public SelectableImageButtonWidget selectedTexture(Identifier texture) {
         selected = texture;
+        return this;
+    }
+
+    public SelectableImageButtonWidget onClick(Runnable runnable) {
+        this.onClick = runnable;
         return this;
     }
 
@@ -49,6 +55,8 @@ public class SelectableImageButtonWidget extends Widget implements Renderable, C
     @Override
     public boolean mouseClickedChecked(MouseButtonEvent event, boolean fromMouse) {
         isSelected = !isSelected;
+
+        if (onClick != null) onClick.run();
         return true;
     }
 

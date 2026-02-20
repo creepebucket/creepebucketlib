@@ -157,8 +157,8 @@ publishing {
             name = "github_packages"
             url = uri("https://maven.pkg.github.com/${project.findProperty('github_repository') ?: System.getenv('GITHUB_REPOSITORY')}")
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = project.findProperty('gpr_user') ?: project.findProperty('github_actor') ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty('gpr_key') ?: project.findProperty('github_token') ?: System.getenv("GITHUB_TOKEN")
             }
         }
     }
