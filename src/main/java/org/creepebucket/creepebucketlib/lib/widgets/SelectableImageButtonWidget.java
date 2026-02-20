@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * 可选中图片按钮控件：根据选中状态显示不同纹理，点击时触发回调。
  */
-public class SelectableImageButtonWidget extends Widget implements Renderable, Clickable, Tooltipable {
+public class SelectableImageButtonWidget extends Widget implements Renderable, Clickable {
     private final Identifier normal;
     public boolean isSelected = false;
     public Runnable onClick;
@@ -57,18 +57,6 @@ public class SelectableImageButtonWidget extends Widget implements Renderable, C
         isSelected = !isSelected;
 
         if (onClick != null) onClick.run();
-        return true;
-    }
-
-    @Override
-    public boolean renderTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
-        if (!isInBounds(mouseX, mouseY)) return false;
-
-        graphics.renderTooltip(
-                ClientUiContext.getFont(),
-                List.of(ClientTooltipComponent.create(this.tooltip.getVisualOrderText())),
-                mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null
-        );
         return true;
     }
 }
