@@ -8,6 +8,7 @@ import org.creepebucket.creepebucketlib.lib.api.Coordinate;
 import org.creepebucket.creepebucketlib.lib.api.SmoothedValue;
 import org.creepebucket.creepebucketlib.lib.api.Widget;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Lifecycle;
+import org.creepebucket.creepebucketlib.lib.ui.WidgetManager;
 
 
 import static org.creepebucket.creepebucketlib.lib.api.Coordinate.*;
@@ -46,6 +47,6 @@ public class TextButtonWidget extends RectangleButtonWidget implements Lifecycle
 
         textWidget.mainColor(textColor().mix(bgColor(), pivot.get())).bgColor(bgColor());
 
-        pivot.doStep(screen.dt());
+        pivot.doStep(((WidgetManager) screen).dt());
     }
 }

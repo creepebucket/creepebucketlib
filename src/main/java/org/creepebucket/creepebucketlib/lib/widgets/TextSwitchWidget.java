@@ -7,6 +7,7 @@ import org.creepebucket.creepebucketlib.lib.api.Coordinate;
 import org.creepebucket.creepebucketlib.lib.api.SmoothedValue;
 import org.creepebucket.creepebucketlib.lib.api.Widget;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
+import org.creepebucket.creepebucketlib.lib.ui.WidgetManager;
 
 
 import static net.minecraft.network.chat.Component.literal;
@@ -26,7 +27,7 @@ public class TextSwitchWidget extends Widget implements Renderable {
 
     @Override
     public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        textDy.doStep(screen.dt());
+        textDy.doStep(((WidgetManager) screen).dt());
 
         graphics.enableScissor(left(), top(), right(), bottom());
 

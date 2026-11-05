@@ -1,11 +1,10 @@
 package org.creepebucket.creepebucketlib.lib.api;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Lifecycle;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
-import org.creepebucket.creepebucketlib.lib.ui.Menu;
-import org.creepebucket.creepebucketlib.lib.ui.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,7 @@ public abstract class Widget {
     public VerticalAlign verticalAlign = VerticalAlign.TOP;
     public List<Widget> children = new ArrayList<>();
     public Widget parent;
-    public Screen<? extends Menu> screen;
+    public Screen screen;
     public List<Animation> animations = new ArrayList<>();
     public List<SmoothedValue> smoothedValues = new ArrayList<>();
     public List<Widget> childrenCache;
