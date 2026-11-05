@@ -1,11 +1,18 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import org.creepebucket.creepebucketlib.client.ClientUiContext;
 import org.creepebucket.creepebucketlib.lib.api.Coordinate;
 import org.creepebucket.creepebucketlib.lib.api.Widget;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
+import org.joml.Matrix3x2fStack;
+
+
+import static org.creepebucket.creepebucketlib.lib.api.Coordinate.*;
 
 /**
  * 文本控件：在指定坐标渲染动态文本。
@@ -15,14 +22,72 @@ public class TextWidget extends Widget implements Renderable {
      * 文本内容提供器
      */
     public Component text;
+    public double scale = 1;
+    public boolean shadow = true;
 
     public TextWidget(Coordinate pos, Component text) {
-        super(pos, Coordinate.ZERO);
+        super(pos, ZERO);
         this.text = text;
+        updateSize();
+    }
+
+    public Component getText() {
+        return text;
+    }
+
+    public TextWidget setText(Component text) {
+        this.text = text;
+        updateSize();
+        return this;
+    }
+
+    public void updateSize() {
+        Font font = ClientUiContext.getFont();
+        int w = (int) Math.round(font.width(text) * scale);
+        int h = (int) Math.round(font.lineHeight * scale);
+        originalSize = fromTopLeft(w, h);
+    }
+
+    public TextWidget scaled(double fact) {
+        this.scale = fact;
+        return setText(text);
+    }
+
+    public TextWidget noShadow() {
+        shadow = false;
+        return this;
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.drawString(ClientUiContext.getFont(), this.text, menuX(), menuY(), mainColor());
+    public int w() {
+        return originalSize.x.apply(0, 0);
+    }
+
+    @Override
+    public int h() {
+        return originalSize.y.apply(0, 0);
+    }
+
+    @Override
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        Font font = ClientUiContext.getFont();
+        float scaled = (float) scale;
+        float x = menuX();
+        float y = menuY();
+        drawScaledString(graphics, font, text, x, y, scaled, mainColorInt(), shadow);
+    }
+
+    public static void drawScaledString(GuiGraphicsExtractor guiGraphics, Font font, Component text, float x, float y, float scale, int color, boolean dropShadow) {
+        drawScaledString(guiGraphics, font, Language.getInstance().getVisualOrder(text), x, y, scale, color, dropShadow);
+    }
+
+    public static void drawScaledString(GuiGraphicsExtractor guiGraphics, Font font, FormattedCharSequence text, float x, float y, float scale, int color, boolean dropShadow) {
+        Matrix3x2fStack poseStack = guiGraphics.pose();
+
+        poseStack.pushMatrix();
+        poseStack.translate(x, y);
+        poseStack.scale(scale, scale);
+        guiGraphics.text(font, text, 0, 0, color, dropShadow);
+        poseStack.popMatrix();
     }
 }

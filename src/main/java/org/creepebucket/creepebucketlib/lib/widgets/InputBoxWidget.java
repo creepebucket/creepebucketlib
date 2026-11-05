@@ -1,7 +1,7 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -36,7 +36,7 @@ public class InputBoxWidget extends Widget implements Renderable, Clickable, Key
     public void onInitialize() {
 
         if (this.box == null) {
-            this.box = new CustomizableEditBox(ClientUiContext.getFont(), x(), y(), w() - 6, h(), Component.empty(), textColor());
+            this.box = new CustomizableEditBox(ClientUiContext.getFont(), x(), y(), w() - 6, h(), Component.empty(), textColorInt());
             this.box.setMaxLength(this.maxLength);
             this.box.setValue(this.initialValue);
             this.box.setCanLoseFocus(true);
@@ -46,12 +46,12 @@ public class InputBoxWidget extends Widget implements Renderable, Clickable, Key
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.fill(x(), y(), x() + w(), y() + h(), bgColor());
-        graphics.renderOutline(x(), y(), w(), h(), mainColor());
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.fill(x(), y(), x() + w(), y() + h(), bgColorInt());
+        graphics.outline(x(), y(), w(), h(), mainColorInt());
 
         this.box.setRectangle(w() - 6, h(), x(), y());
-        this.box.render(graphics, mouseX, mouseY, partialTick);
+        this.box.extractRenderState(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override

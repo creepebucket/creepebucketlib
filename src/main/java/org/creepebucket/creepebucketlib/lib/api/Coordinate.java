@@ -8,18 +8,31 @@ import java.util.function.BiFunction;
  * @param x 以 (sw, sh) 为输入的 X 计算函数。
  * @param y 以 (sw, sh) 为输入的 Y 计算函数。
  */
-public record Coordinate(BiFunction<Integer, Integer, Integer> x, BiFunction<Integer, Integer, Integer> y) {
+public class Coordinate {
 
     public static Coordinate ZERO = Coordinate.fromTopLeft(0, 0);
+    public static Coordinate CENTER = Coordinate.fromCenter(0, 0);
+    public static Coordinate FULL = Coordinate.fromBottomRight(0, 0);
     private static int screenWidth;
     private static int screenHeight;
     private static int guiLeft;
     private static int guiTop;
+    public BiFunction<Integer, Integer, Integer> x, y;
 
     /**
      * 创建一个坐标计算器。
      */
-    public Coordinate {
+    public Coordinate(BiFunction<Integer, Integer, Integer> x, BiFunction<Integer, Integer, Integer> y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public static int getScreenWidth() {
+        return screenWidth;
+    }
+
+    public static int getScreenHeight() {
+        return screenHeight;
     }
 
     public static void updateContext(int screenWidth, int screenHeight, int guiLeft, int guiTop) {
@@ -62,6 +75,39 @@ public record Coordinate(BiFunction<Integer, Integer, Integer> x, BiFunction<Int
      */
     public static Coordinate fromCenter(int deltaX, int deltaY) {
         return new Coordinate((sw, sh) -> sw / 2 + deltaX, (sw, sh) -> sh / 2 + deltaY);
+    }
+
+    /**
+     * 以屏幕中心左侧为基准创建坐标。
+     */
+    public static Coordinate fromCenterLeft(int deltaX, int deltaY) {
+        return new Coordinate((sw, sh) -> deltaX, (sw, sh) -> sh / 2 + deltaY);
+    }
+
+    /**
+     * 以屏幕中心右侧为基准创建坐标。
+     */
+    public static Coordinate fromCenterRight(int deltaX, int deltaY) {
+        return new Coordinate((sw, sh) -> sw + deltaX, (sw, sh) -> sh / 2 + deltaY);
+    }
+
+    /**
+     * 以屏幕中心上方为基准创建坐标。
+     */
+    public static Coordinate fromCenterTop(int deltaX, int deltaY) {
+        return new Coordinate((sw, sh) -> sw / 2 + deltaX, (sw, sh) -> deltaY);
+    }
+
+    /**
+     * 以屏幕中心下方为基准创建坐标。
+     */
+    public static Coordinate fromCenterBottom(int deltaX, int deltaY) {
+        return new Coordinate((sw, sh) -> sw / 2 + deltaX, (sw, sh) -> sh + deltaY);
+    }
+
+    public static Coordinate custom(Number ratioX, Number deltaX, Number ratioY, Number deltaY) {
+        return new Coordinate((sw, sh) -> (int) (sw * ratioX.doubleValue() + deltaX.doubleValue()),
+                (sw, sh) -> (int) (sh * ratioY.doubleValue() + deltaY.doubleValue()));
     }
 
     /**

@@ -1,12 +1,15 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.inventory.Slot;
 import org.creepebucket.creepebucketlib.lib.api.ClientSlotManager;
 import org.creepebucket.creepebucketlib.lib.api.Coordinate;
 import org.creepebucket.creepebucketlib.lib.api.Widget;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Lifecycle;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
+
+
+import static org.creepebucket.creepebucketlib.lib.api.Coordinate.*;
 
 /**
  * 槽位控件：每 tick 将 {@link Slot} 的客户端坐标同步到 {@link ClientSlotManager}。
@@ -21,7 +24,7 @@ public class SlotWidget extends Widget implements Lifecycle, Renderable {
      * 创建一个槽位控件。
      */
     public SlotWidget(Slot slot, Coordinate pos) {
-        super(pos, Coordinate.ZERO);
+        super(pos, fromTopLeft(16, 16));
         this.slot = slot;
     }
 
@@ -42,7 +45,7 @@ public class SlotWidget extends Widget implements Lifecycle, Renderable {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         ClientSlotManager.setClientPosition(this.slot, menuX(), menuY());
     }
 }

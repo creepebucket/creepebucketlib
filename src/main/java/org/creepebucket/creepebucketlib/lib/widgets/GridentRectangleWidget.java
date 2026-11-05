@@ -1,6 +1,6 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.creepebucket.creepebucketlib.lib.api.Animation;
 import org.creepebucket.creepebucketlib.lib.api.Color;
 import org.creepebucket.creepebucketlib.lib.api.Coordinate;
@@ -36,7 +36,7 @@ public class GridentRectangleWidget extends Widget implements Renderable {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         double mult = 1;
         Widget parent = this;
         while (!(parent instanceof Widget.Root)) {

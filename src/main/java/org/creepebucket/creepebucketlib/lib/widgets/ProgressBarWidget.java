@@ -1,0 +1,73 @@
+package org.creepebucket.creepebucketlib.lib.widgets;
+
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.creepebucket.creepebucketlib.lib.api.Coordinate;
+import org.creepebucket.creepebucketlib.lib.api.DynamicValue;
+import org.creepebucket.creepebucketlib.lib.api.SmoothedValue;
+import org.creepebucket.creepebucketlib.lib.api.Widget;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Lifecycle;
+import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
+
+import static net.minecraft.network.chat.Component.literal;
+import static org.creepebucket.creepebucketlib.lib.api.Coordinate.fromCenterLeft;
+
+public class ProgressBarWidget extends Widget implements Renderable, Lifecycle {
+    public DynamicValue<Double> numerator, denominator;
+    public SmoothedValue smoothed = new SmoothedValue(0);
+    public NumberDisplayWidget ratioWidget;
+    public TextWidget textWidget;
+    public boolean hideText = false;
+
+    public ProgressBarWidget(Coordinate pos, Coordinate size, DynamicValue<Double> numerator, DynamicValue<Double> denominator) {
+        super(pos, size);
+
+        this.numerator = numerator;
+        this.denominator = denominator;
+
+        smoothedValues.add(smoothed);
+    }
+
+    public ProgressBarWidget hideText() {
+        hideText = true;
+        return this;
+    }
+
+    @Override
+    public void onInitialize() {
+        textWidget = new TextWidget(fromCenterLeft(-2, 1), literal("%"));
+        addChild(textWidget.noShadow().rightAlign().centerAlignY());
+
+        ratioWidget = new NumberDisplayWidget(fromCenterLeft(-9, 0), DynamicValue.fromSupplier(() -> numerator.get() * 100 / denominator.get()), 5, 1, true);
+        addChild(ratioWidget.rightAlign().centerAlignY());
+    }
+
+    @Override
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        smoothed.set(numerator.get());
+        var fillX = w() * smoothed.get() / denominator.get();
+
+        var filled = (int) (left() + Math.round(fillX));
+        graphics.fill(left(), top(), filled, bottom(), mainColorInt());
+        graphics.fill(filled, top(), right(), bottom(), bgColorInt());
+
+        var targetX = w() * smoothed.target / denominator.get();
+        textWidget.dx.set(targetX < 38 ? targetX + 39 : targetX);
+        ratioWidget.dx.set(targetX < 38 ? targetX + 39 : targetX);
+
+        if (fillX < 38) {
+            textWidget.mainColor(mainColor().toArgbWithAlphaMult(0.2));
+            ratioWidget.mainColor(mainColor().toArgbWithAlphaMult(0.2));
+        } else {
+            textWidget.mainColor(0x9f000000);
+            ratioWidget.mainColor(0x9f000000);
+        }
+
+        if (h() >= 9 && !hideText) {
+            textWidget.enable();
+            ratioWidget.enable();
+        } else {
+            textWidget.disable();
+            ratioWidget.disable();
+        }
+    }
+}

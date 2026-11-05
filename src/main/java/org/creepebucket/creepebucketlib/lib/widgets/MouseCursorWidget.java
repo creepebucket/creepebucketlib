@@ -1,7 +1,7 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.creepebucket.creepebucketlib.client.ClientUiContext;
@@ -13,6 +13,10 @@ import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import static org.creepebucket.creepebucketlib.lib.api.Coordinate.*;
+import static net.minecraft.network.chat.Component.literal;
+
 import static net.minecraft.util.Mth.hsvToRgb;
 
 public class MouseCursorWidget extends Widget implements Renderable, Clickable {
@@ -20,27 +24,27 @@ public class MouseCursorWidget extends Widget implements Renderable, Clickable {
     public List<Boolean> downs = new ArrayList<>(List.of(false, false, false));
 
     public MouseCursorWidget() {
-        super(Coordinate.ZERO, Coordinate.ZERO);
+        super(ZERO, ZERO);
         renderInForeground = true;
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         // 傻逼ubuntu录屏不能在mc录鼠标指针, 只好自己写一个
         var color = hsvToRgb((Minecraft.getInstance().level.getGameTime() * 0.03f) % 1, 1, 1) | 0xFF000000;
-        graphics.renderOutline(mouseX - 2, mouseY - 2, 5, 5, color);
+        graphics.outline(mouseX - 2, mouseY - 2, 5, 5, color);
 
         int dy = 0;
         if (downs.get(0)) {
-            graphics.drawString(ClientUiContext.getFont(), Component.literal(mb.get(0)), mouseX + 5, mouseY + dy, color);
+            graphics.text(ClientUiContext.getFont(), literal(mb.get(0)), mouseX + 5, mouseY + dy, color, false);
             dy += 9;
         }
         if (downs.get(1)) {
-            graphics.drawString(ClientUiContext.getFont(), Component.literal(mb.get(1)), mouseX + 5, mouseY + dy, color);
+            graphics.text(ClientUiContext.getFont(), literal(mb.get(1)), mouseX + 5, mouseY + dy, color, false);
             dy += 9;
         }
         if (downs.get(2)) {
-            graphics.drawString(ClientUiContext.getFont(), Component.literal(mb.get(2)), mouseX + 5, mouseY + dy, color);
+            graphics.text(ClientUiContext.getFont(), literal(mb.get(2)), mouseX + 5, mouseY + dy, color, false);
             dy += 9;
         }
     }

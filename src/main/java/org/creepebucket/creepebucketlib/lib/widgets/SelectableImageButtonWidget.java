@@ -1,19 +1,13 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
-import org.creepebucket.creepebucketlib.client.ClientUiContext;
 import org.creepebucket.creepebucketlib.lib.api.Coordinate;
 import org.creepebucket.creepebucketlib.lib.api.Widget;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Clickable;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
-import org.creepebucket.creepebucketlib.lib.api.widgets.Tooltipable;
-
-import java.util.List;
 
 /**
  * 可选中图片按钮控件：根据选中状态显示不同纹理，点击时触发回调。
@@ -46,10 +40,10 @@ public class SelectableImageButtonWidget extends Widget implements Renderable, C
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         // 根据选中状态选择纹理并渲染
         var tex = isSelected ? this.selected : this.normal;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, tex, x(), y(), 0, 0, w(), h(), w(), h(), w(), h(), mainColor());
+        graphics.blit(RenderPipelines.GUI_TEXTURED, tex, x(), y(), 0, 0, w(), h(), w(), h(), w(), h(), mainColorInt());
     }
 
     @Override

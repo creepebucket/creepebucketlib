@@ -14,6 +14,7 @@ public class Creepebucketlib {
 
     public Creepebucketlib(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(ModNetworkPackets::registerPayloadHandlers);
+        modContainer.registerConfig(net.neoforged.fml.config.ModConfig.Type.COMMON, ModConfig.CONFIG_SPEC);
         LOGGER.info("creepebucketlib_loaded");
     }
 }

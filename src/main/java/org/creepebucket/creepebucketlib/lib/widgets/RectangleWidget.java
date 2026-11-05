@@ -1,6 +1,6 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.creepebucket.creepebucketlib.lib.api.Coordinate;
 import org.creepebucket.creepebucketlib.lib.api.Widget;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
@@ -12,7 +12,7 @@ public class RectangleWidget extends Widget implements Renderable {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.fill(left(), top(), right(), bottom(), mainColor());
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.fill(left(), top(), right(), bottom(), mainColorInt());
     }
 }

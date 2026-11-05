@@ -1,11 +1,14 @@
 package org.creepebucket.creepebucketlib.lib.api;
 
+import org.creepebucket.creepebucketlib.ModConfig;
+
 import static org.creepebucket.creepebucketlib.ModUtils.now;
 
 public abstract class Animation {
     public double start, duration = 0; // 秒
     public double dx = 0, dy = 0, dw = 0, dh = 0;
     public double alphaMultMain = 1, alphaMultBg = 1, alphaMultText = 1;
+    public boolean started = false;
 
     public boolean isActive() {
         var now = now();
@@ -13,7 +16,10 @@ public abstract class Animation {
     }
 
     public boolean isExpired() {
-        return start + duration <= now();
+        return ModConfig.CONFIG.disableAnimations.get() || start + duration <= now();
+    }
+    public boolean isStarted() {
+        return now() >= start && !started;
     }
 
     public abstract void step(double dt);
@@ -21,9 +27,18 @@ public abstract class Animation {
     public void onExpire(Widget widget) {
     }
 
+    public void onStart(Widget widget) {
+        started = true;
+    }
+
     public static class FadeIn extends Animation {
         public FadeIn(double duration) {
             this.duration = duration;
+        }
+
+        @Override
+        public void onStart(Widget widget) {
+            super.onStart(widget);
         }
 
         @Override
@@ -86,9 +101,21 @@ public abstract class Animation {
                 dy = Math.pow(start + duration - now(), 3) * 1000;
             }
         }
+
+        public static class Static extends FadeIn {
+            public Static(double duration) {
+                super(duration);
+            }
+
+            @Override
+            public void step(double dt) {
+            }
+        }
     }
 
     public static class FadeOut extends Animation {
+        public boolean doDelete = true;
+
         public FadeOut(double duration) {
             this.duration = duration;
         }
@@ -103,7 +130,13 @@ public abstract class Animation {
 
         @Override
         public void onExpire(Widget widget) {
-            widget.removeMyself();
+            if (doDelete) widget.removeMyself();
+            else widget.disable();
+        }
+
+        public FadeOut noDeletion() {
+            doDelete = false;
+            return this;
         }
 
         public static class ToLeft extends FadeOut {
@@ -151,6 +184,16 @@ public abstract class Animation {
             public void step(double dt) {
                 super.step(dt);
                 dy = Math.pow(now() - start, 3) * 1000;
+            }
+        }
+
+        public static class Static extends FadeOut {
+            public Static(double duration) {
+                super(duration);
+            }
+
+            @Override
+            public void step(double dt) {
             }
         }
     }

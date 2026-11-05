@@ -14,8 +14,8 @@ import static org.creepebucket.creepebucketlib.Creepebucketlib.MODID;
  */
 public record SimpleKvPacket(String key, Object value) implements CustomPacketPayload {
 
-    public static final Type<SimpleKvPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(MODID, "wand_menu_kv"));
+    public static final CustomPacketPayload.Type<SimpleKvPacket> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(MODID, "wand_menu_kv"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SimpleKvPacket> STREAM_CODEC = new StreamCodec<>() {
         @Override

@@ -1,6 +1,6 @@
 package org.creepebucket.creepebucketlib.lib.api;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Lifecycle;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Renderable;
@@ -10,52 +10,118 @@ import org.creepebucket.creepebucketlib.lib.ui.Screen;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import static org.creepebucket.creepebucketlib.lib.api.Coordinate.*;
+
 import static org.creepebucket.creepebucketlib.ModUtils.now;
 
-/**
- * UI 控件基类：提供位置和尺寸的基础支持，通过实现功能接口来获得能力。
- */
+    /**
+     * UI 控件基类：提供位置和尺寸的基础支持，通过实现功能接口来获得能力。
+     */
 public abstract class Widget {
+    public enum Align {
+        LEFT,
+        CENTER,
+        RIGHT
+    }
+
+    public enum VerticalAlign {
+        TOP,
+        CENTER,
+        BOTTOM
+
+    }
+
     public Coordinate originalPos, originalSize;
     public SmoothedValue dx = new SmoothedValue(0), dy = new SmoothedValue(0), dw = new SmoothedValue(0), dh = new SmoothedValue(0);
-    public Color originalMainColor = new Color(-1), originalBgColor = new Color(-2147483647), originalTextColor = new Color(-1);
+    public Color originalMainColor, originalBgColor, originalTextColor;
     public Component tooltip;
-    public boolean doShowTooltip = false, renderInForeground = false;
+    public boolean doShowTooltip = false, renderInForeground = false, enabled = true;
+    public Align align = Align.LEFT;
+    public VerticalAlign verticalAlign = VerticalAlign.TOP;
     public List<Widget> children = new ArrayList<>();
     public Widget parent;
     public Screen<? extends Menu> screen;
     public List<Animation> animations = new ArrayList<>();
     public List<SmoothedValue> smoothedValues = new ArrayList<>();
+    public List<Widget> childrenCache;
+    public Integer xCache, yCache, wCache, hCache;
+    public Integer menuXCache, menuYCache;
+    public Integer originalXCache, originalYCache, originalWCache, originalHCache;
+    public Integer mainColorIntCache, bgColorIntCache, textColorIntCache;
+    public Integer screenWCache, screenHCache;
+    public List<Runnable> clickBehaviors = new ArrayList<>();
 
     public Widget(Coordinate pos, Coordinate size) {
-        this.originalPos = pos;
-        this.originalSize = size;
+        this.originalPos = new Coordinate(pos.x, pos.y);
+        this.originalSize = new Coordinate(size.x, size.y);
 
         smoothedValues.addAll(List.of(dx, dy, dw, dh));
     }
 
-    public void renderWidget(GuiGraphics graphics, int mx, int my, float partialTick, double dt, boolean isForeground) {
+    public Widget leftAlign() {
+        align = Align.LEFT;
+        return this;
+    }
+
+    public Widget centerAlign() {
+        align = Align.CENTER;
+        return this;
+    }
+
+    public Widget rightAlign() {
+        align = Align.RIGHT;
+        return this;
+    }
+
+    public Widget topAlignY() {
+        verticalAlign = VerticalAlign.TOP;
+        return this;
+    }
+
+    public Widget centerAlignY() {
+        verticalAlign = VerticalAlign.CENTER;
+        return this;
+    }
+
+    public Widget bottomAlignY() {
+        verticalAlign = VerticalAlign.BOTTOM;
+        return this;
+    }
+
+    public void clearCache() {
+        childrenCache = null;
+        xCache = null; yCache = null; wCache = null; hCache = null;
+        menuXCache = null; menuYCache = null;
+        originalXCache = null; originalYCache = null; originalWCache = null; originalHCache = null;
+        mainColorIntCache = null; bgColorIntCache = null; textColorIntCache = null;
+        screenWCache = null; screenHCache = null;
+    }
+
+    public void renderWidget(GuiGraphicsExtractor graphics, int mx, int my, float partialTick, double dt, boolean isForeground) {
+        clearCache();
+
         if (isForeground == renderInForeground) {
 
             // 动画的step
             for (Animation animation : animations) animation.step(dt);
 
             // 自己的渲染逻辑
-            if (this instanceof Renderable renderable) {
+            if (this instanceof Renderable renderable && enabled) {
                 renderable.render(graphics, mx, my, partialTick);
             }
 
-            // 检查动画过期状态
+            // 检查动画过期/启动状态
             var expiredAnimations = animations.stream().filter(Animation::isExpired).toList();
-
-            for (Animation animation : animations) {
-                if (animation.isExpired()) {
-                    animation.onExpire(this);
-                }
-            }
+            var startedAnimations = animations.stream().filter(Animation::isStarted).toList();
 
             for (Animation animation : expiredAnimations) {
+                animation.onExpire(this);
                 animations.remove(animation);
+            }
+
+            for (Animation animation : startedAnimations) {
+                animation.onStart(this);
             }
 
             // 平滑逻辑
@@ -63,7 +129,26 @@ public abstract class Widget {
         }
 
         // 孩子的渲染逻辑
-        for (Widget child : List.copyOf(children)) child.renderWidget(graphics, mx, my, partialTick, dt, isForeground);
+        if (enabled) for (Widget child : List.copyOf(children)) child.renderWidget(graphics, mx, my, partialTick, dt, isForeground);
+    }
+
+    /**
+     * 自身及所有祖先都启用时才算可用，禁用组件的整棵子树都不接收输入事件。
+     */
+    public boolean isEffectivelyEnabled() {
+        for (Widget widget = this; widget != null; widget = widget.parent)
+            if (!widget.enabled) return false;
+        return true;
+    }
+
+    public Widget enable() {
+        enabled = true;
+        return this;
+    }
+
+    public Widget disable() {
+        enabled = false;
+        return this;
     }
 
     public Widget addAnimation(Animation animation, double delay) {
@@ -84,11 +169,27 @@ public abstract class Widget {
         return widget;
     }
 
+    public Widget addChildFirst(Widget widget) {
+        children.addFirst(widget);
+        widget.parent = this;
+        widget.screen = screen;
+        for (Widget w : widget.allChild()) w.screen = screen;
+        if (widget instanceof Lifecycle lifecycle) lifecycle.onInitialize();
+        return widget;
+    }
+
     public List<Widget> allChild() {
-        List<Widget> list = new ArrayList<>(children);
-        for (Widget widget : children) {
+        // 先尝试读取缓存
+        if (childrenCache != null) return childrenCache;
+
+        // 未命中则动态更新缓存
+        List<Widget> list = new ArrayList<>();
+        for (int i = children.size() - 1; i >= 0; i--) {
+            Widget widget = children.get(i);
+            list.add(widget);
             list.addAll(widget.allChild());
         }
+        childrenCache = list;
         return list;
     }
 
@@ -107,7 +208,7 @@ public abstract class Widget {
     public Widget dx(SmoothedValue value) {
         smoothedValues.remove(dx);
         dx = value;
-        if (!dx.bound) {
+        if (!dx.bound && !(dx instanceof SmoothedValue.TransformedValue)) {
             smoothedValues.add(dx);
             dx.bound = true;
         }
@@ -117,7 +218,7 @@ public abstract class Widget {
     public Widget dy(SmoothedValue value) {
         smoothedValues.remove(dy);
         dy = value;
-        if (!dy.bound) {
+        if (!dy.bound && !(dy instanceof SmoothedValue.TransformedValue)) {
             smoothedValues.add(dy);
             dy.bound = true;
         }
@@ -127,7 +228,7 @@ public abstract class Widget {
     public Widget dw(SmoothedValue value) {
         smoothedValues.remove(dw);
         dw = value;
-        if (!dw.bound) {
+        if (!dw.bound && !(dw instanceof SmoothedValue.TransformedValue)) {
             smoothedValues.add(dw);
             dw.bound = true;
         }
@@ -137,7 +238,7 @@ public abstract class Widget {
     public Widget dh(SmoothedValue value) {
         smoothedValues.remove(dh);
         dh = value;
-        if (!dh.bound) {
+        if (!dh.bound && !(dh instanceof SmoothedValue.TransformedValue)) {
             smoothedValues.add(dh);
             dh.bound = true;
         }
@@ -149,14 +250,31 @@ public abstract class Widget {
         return this;
     }
 
+    public Widget mainColor(int color) {
+        return mainColor(new Color(color));
+    }
+
     public Widget bgColor(Color color) {
         originalBgColor = color;
         return this;
     }
 
+    public Widget bgColor(int color) {
+            return bgColor(new Color(color));
+    }
+
     public Widget textColor(Color color) {
         originalTextColor = color;
         return this;
+    }
+
+    public Widget testColor(int color) {
+            return textColor(new Color(color));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Widget> T applyTheme(ThemeTemplate<T> template) {
+        return template.function.apply((T) this);
     }
 
     public Widget color(Color color) {
@@ -167,18 +285,71 @@ public abstract class Widget {
         return mainColor(color).textColor(color).bgColor(color);
     }
 
-    public Widget tooltip(Component tooltip) {
-        this.tooltip = tooltip;
-        doShowTooltip = true;
+    public Widget addClickBehavior(Runnable r) {
+        clickBehaviors.add(r);
         return this;
     }
 
+    public Widget tooltip(Component tooltip) {
+        this.tooltip = tooltip;
+        doShowTooltip = tooltip != null;
+        return this;
+    }
+
+    public int originalX() {
+        if (originalXCache != null) return originalXCache;
+        double x = originalPos.x.apply(parent.w(), parent.h());
+        if (align == Align.CENTER) x -= w() / 2.0;
+        else if (align == Align.RIGHT) x -= w();
+        return originalXCache = (int) Math.round(x);
+    }
+
+    public int originalY() {
+        if (originalYCache != null) return originalYCache;
+        double y = originalPos.y.apply(parent.w(), parent.h());
+        if (verticalAlign == VerticalAlign.CENTER) y -= h() / 2.0;
+        else if (verticalAlign == VerticalAlign.BOTTOM) y -= h();
+        return originalYCache = (int) Math.round(y);
+    }
+
+    public int originalW() {
+        if (originalWCache != null) return originalWCache;
+        return originalWCache = originalSize.x.apply(parent.w(), parent.h());
+    }
+
+    public int originalH() {
+        if (originalHCache != null) return originalHCache;
+        return originalHCache = originalSize.y.apply(parent.w(), parent.h());
+    }
+
+    public int getScreenW() {
+        if (screenWCache != null) return screenWCache;
+        var parent = this;
+
+        while (!(parent instanceof Widget.Root)) {
+            parent = parent.parent;
+        }
+
+        return screenWCache = parent.w();
+    }
+    public int getScreenH() {
+        if (screenHCache != null) return screenHCache;
+        var parent = this;
+
+        while (!(parent instanceof Widget.Root)) {
+            parent = parent.parent;
+        }
+
+        return screenHCache = parent.h();
+    }
+
     public int x() {
-        double x = originalPos.toScreenX() + dx.getInt() + parent.x();
+        if (xCache != null) return xCache;
+        double x = originalPos.x.apply(parent.w(), parent.h()) + dx.getInt() + parent.x();
         var allAnimations = new ArrayList<Animation>();
         var parent = this;
 
-        while (!(parent instanceof Root)) {
+        while (!(parent instanceof Widget.Root)) {
             allAnimations.addAll(parent.animations);
             parent = parent.parent;
         }
@@ -186,15 +357,18 @@ public abstract class Widget {
         for (Animation animation : allAnimations) {
             if (animation.isActive()) x += animation.dx;
         }
-        return (int) Math.round(x);
+        if (align == Align.CENTER) x -= w() / 2.0;
+        else if (align == Align.RIGHT) x -= w();
+        return xCache = (int) Math.round(x);
     }
 
     public int y() {
-        double y = originalPos.toScreenY() + dy.getInt() + parent.y();
+        if (yCache != null) return yCache;
+        double y = originalPos.y.apply(parent.w(), parent.h()) + dy.getInt() + parent.y();
         var allAnimations = new ArrayList<Animation>();
         var parent = this;
 
-        while (!(parent instanceof Root)) {
+        while (!(parent instanceof Widget.Root)) {
             allAnimations.addAll(parent.animations);
             parent = parent.parent;
         }
@@ -202,15 +376,18 @@ public abstract class Widget {
         for (Animation animation : allAnimations) {
             if (animation.isActive()) y += animation.dy;
         }
-        return (int) Math.round(y);
+        if (verticalAlign == VerticalAlign.CENTER) y -= h() / 2.0;
+        else if (verticalAlign == VerticalAlign.BOTTOM) y -= h();
+        return yCache = (int) Math.round(y);
     }
 
     public int w() {
-        double w = originalSize.toScreenX() + dw.getInt();
+        if (wCache != null) return wCache;
+        double w = originalSize.x.apply(parent.w(), parent.h()) + dw.getInt();
         var allAnimations = new ArrayList<Animation>();
         var parent = this;
 
-        while (!(parent instanceof Root)) {
+        while (!(parent instanceof Widget.Root)) {
             allAnimations.addAll(parent.animations);
             parent = parent.parent;
         }
@@ -218,15 +395,16 @@ public abstract class Widget {
         for (Animation animation : allAnimations) {
             if (animation.isActive()) w += animation.dw;
         }
-        return (int) Math.round(w);
+        return wCache = (int) Math.round(w);
     }
 
     public int h() {
-        double h = originalSize.toScreenY() + dh.getInt();
+        if (hCache != null) return hCache;
+        double h = originalSize.y.apply(parent.w(), parent.h()) + dh.getInt();
         var allAnimations = new ArrayList<Animation>();
         var parent = this;
 
-        while (!(parent instanceof Root)) {
+        while (!(parent instanceof Widget.Root)) {
             allAnimations.addAll(parent.animations);
             parent = parent.parent;
         }
@@ -234,15 +412,16 @@ public abstract class Widget {
         for (Animation animation : allAnimations) {
             if (animation.isActive()) h += animation.dh;
         }
-        return (int) Math.round(h);
+        return hCache = (int) Math.round(h);
     }
 
     public int menuX() {
-        double x = originalPos.toScreenX() + dx.getInt() + parent.menuX();
+        if (menuXCache != null) return menuXCache;
+        double x = originalPos.x.apply(parent.w(), parent.h()) + dx.getInt() + parent.menuX();
         var allAnimations = new ArrayList<Animation>();
         var parent = this;
 
-        while (!(parent instanceof Root)) {
+        while (!(parent instanceof Widget.Root)) {
             allAnimations.addAll(parent.animations);
             parent = parent.parent;
         }
@@ -250,15 +429,18 @@ public abstract class Widget {
         for (Animation animation : allAnimations) {
             if (animation.isActive()) x += animation.dx;
         }
-        return (int) Math.round(x);
+        if (align == Align.CENTER) x -= w() / 2.0;
+        else if (align == Align.RIGHT) x -= w();
+        return menuXCache = (int) Math.round(x);
     }
 
     public int menuY() {
-        double y = originalPos.toScreenY() + dy.getInt() + parent.menuY();
+        if (menuYCache != null) return menuYCache;
+        double y = originalPos.y.apply(parent.w(), parent.h()) + dy.getInt() + parent.menuY();
         var allAnimations = new ArrayList<Animation>();
         var parent = this;
 
-        while (!(parent instanceof Root)) {
+        while (!(parent instanceof Widget.Root)) {
             allAnimations.addAll(parent.animations);
             parent = parent.parent;
         }
@@ -266,55 +448,69 @@ public abstract class Widget {
         for (Animation animation : allAnimations) {
             if (animation.isActive()) y += animation.dy;
         }
-        return (int) Math.round(y);
+        if (verticalAlign == VerticalAlign.CENTER) y -= h() / 2.0;
+        else if (verticalAlign == VerticalAlign.BOTTOM) y -= h();
+        return menuYCache = (int) Math.round(y);
     }
 
-    public int mainColor() {
+    public int mainColorInt() {
+        if (mainColorIntCache != null) return mainColorIntCache;
         double mult = 1;
-        var allAnimations = new ArrayList<Animation>();
-        var parent = this;
-
-        while (!(parent instanceof Root)) { // 统计自根以来的alphaMult
-            allAnimations.addAll(parent.animations);
-            parent = parent.parent;
+        Widget p = this;
+        while (!(p instanceof Widget.Root)) {
+            for (Animation animation : p.animations) {
+                if (animation.isActive()) mult *= animation.alphaMultMain;
+            }
+            p = p.parent;
         }
 
-        for (Animation animation : allAnimations) {
-            if (animation.isActive()) mult *= animation.alphaMultMain;
-        }
-        return originalMainColor.toArgbWithAlphaMult(mult);
+        Widget colorWidget = this;
+        while (colorWidget.originalMainColor == null) colorWidget = colorWidget.parent;
+        return mainColorIntCache = colorWidget.originalMainColor.toArgbWithAlphaMult(mult);
     }
 
-    public int bgColor() {
-        double mult = 1;
-        var allAnimations = new ArrayList<Animation>();
-        var parent = this;
-
-        while (!(parent instanceof Root)) { // 统计自根以来的alphaMult
-            allAnimations.addAll(parent.animations);
-            parent = parent.parent;
-        }
-
-        for (Animation animation : allAnimations) {
-            if (animation.isActive()) mult *= animation.alphaMultBg;
-        }
-        return originalBgColor.toArgbWithAlphaMult(mult);
+    public Color mainColor() {
+        return new Color(mainColorInt());
     }
 
-    public int textColor() {
+    public int bgColorInt() {
+        if (bgColorIntCache != null) return bgColorIntCache;
         double mult = 1;
-        var allAnimations = new ArrayList<Animation>();
-        var parent = this;
-
-        while (!(parent instanceof Root)) { // 统计自根以来的alphaMult
-            allAnimations.addAll(parent.animations);
-            parent = parent.parent;
+        Widget p = this;
+        while (!(p instanceof Widget.Root)) {
+            for (Animation animation : p.animations) {
+                if (animation.isActive()) mult *= animation.alphaMultBg;
+            }
+            p = p.parent;
         }
 
-        for (Animation animation : allAnimations) {
-            if (animation.isActive()) mult *= animation.alphaMultText;
+        Widget colorWidget = this;
+        while (colorWidget.originalBgColor == null) colorWidget = colorWidget.parent;
+        return bgColorIntCache = colorWidget.originalBgColor.toArgbWithAlphaMult(mult);
+    }
+
+    public Color bgColor() {
+        return new Color(bgColorInt());
+    }
+
+    public int textColorInt() {
+        if (textColorIntCache != null) return textColorIntCache;
+        double mult = 1;
+        Widget p = this;
+        while (!(p instanceof Widget.Root)) {
+            for (Animation animation : p.animations) {
+                if (animation.isActive()) mult *= animation.alphaMultText;
+            }
+            p = p.parent;
         }
-        return originalTextColor.toArgbWithAlphaMult(mult);
+
+        Widget colorWidget = this;
+        while (colorWidget.originalTextColor == null) colorWidget = colorWidget.parent;
+        return textColorIntCache = colorWidget.originalTextColor.toArgbWithAlphaMult(mult);
+    }
+
+    public Color textColor() {
+        return new Color(textColorInt());
     }
 
     public int left() {
@@ -343,7 +539,11 @@ public abstract class Widget {
 
     public static class Root extends Widget {
         public Root() {
-            super(Coordinate.fromTopLeft(0, 0), Coordinate.fromTopLeft(0, 0));
+            super(fromTopLeft(0, 0), fromTopLeft(0, 0));
+
+            this.originalMainColor = new Color(-1);
+            this.originalBgColor = new Color(0, 0, 0, 128);
+            this.originalTextColor = new Color(-1);
         }
 
         @Override
@@ -358,12 +558,12 @@ public abstract class Widget {
 
         @Override
         public int w() {
-            return 0;
+            return getScreenWidth();
         }
 
         @Override
         public int h() {
-            return 0;
+            return getScreenHeight();
         }
 
         @Override

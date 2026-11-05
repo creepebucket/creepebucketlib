@@ -1,6 +1,6 @@
 package org.creepebucket.creepebucketlib.lib.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.util.Mth;
 import org.creepebucket.creepebucketlib.lib.api.Color;
@@ -17,6 +17,7 @@ public class ScrollbarWidget extends Widget implements MouseDraggable, Clickable
     public boolean isDragging = false, reverseDirection;
     public String axis;
     public Coordinate region;
+    public double contentLength;
 
     public ScrollbarWidget(Coordinate pos, Coordinate size, Coordinate region, SmoothedValue value, String axis) {
         super(pos, size);
@@ -35,7 +36,7 @@ public class ScrollbarWidget extends Widget implements MouseDraggable, Clickable
         if (!isDragging) return false;
 
         // 决定缩放因子和值修改
-        // h/w -> max 映射
+        // h/w -> denominator 映射
 
         var maxValue = region.toScreenY();
         var minValue = region.toScreenX();
@@ -44,14 +45,16 @@ public class ScrollbarWidget extends Widget implements MouseDraggable, Clickable
         if (axis == "x" || axis == "X") screenValue = w();
         else screenValue = h();
 
-        double blockLengthRatio = (double) screenValue / (maxValue - minValue);
+        double blockLengthRatio = Math.min(1.0, (double) screenValue / Math.max(1, contentLength > 0 ? contentLength : (maxValue - minValue + screenValue)));
 
         int delta;
 
+        double rangeRatio = 1 - blockLengthRatio;
+        if (rangeRatio <= 0) return true;
         if (axis == "x" || axis == "X") {
-            delta = Math.toIntExact(Math.round(dragX / w() * (maxValue - minValue) / (1 - blockLengthRatio)));
+            delta = (int) Mth.clamp(Math.round(dragX / w() * (maxValue - minValue) / rangeRatio), Integer.MIN_VALUE, Integer.MAX_VALUE);
         } else {
-            delta = Math.toIntExact(Math.round(dragY / h() * (maxValue - minValue) / (1 - blockLengthRatio)));
+            delta = (int) Mth.clamp(Math.round(dragY / h() * (maxValue - minValue) / rangeRatio), Integer.MIN_VALUE, Integer.MAX_VALUE);
         }
 
         value.set(Mth.clamp(value.target + delta * (reverseDirection ? -1 : 1), minValue, maxValue));
@@ -74,7 +77,7 @@ public class ScrollbarWidget extends Widget implements MouseDraggable, Clickable
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         // 根据占比动态填充矩形
 
         var maxValue = region.toScreenY();
@@ -84,7 +87,7 @@ public class ScrollbarWidget extends Widget implements MouseDraggable, Clickable
         if (axis == "x" || axis == "X") screenValue = w();
         else screenValue = h();
 
-        double blockLengthRatio = (double) screenValue / (maxValue - minValue);
+        double blockLengthRatio = Math.min(1.0, (double) screenValue / Math.max(1, contentLength > 0 ? contentLength : (maxValue - minValue + screenValue)));
         double blockStartRatio = (value.get() - minValue) / (maxValue - minValue);
         if (reverseDirection) blockStartRatio = 1 - blockStartRatio;
         blockStartRatio = blockStartRatio * (1 - blockLengthRatio);
@@ -105,15 +108,15 @@ public class ScrollbarWidget extends Widget implements MouseDraggable, Clickable
         }
 
         // 背景
-        graphics.fill(x(), y(), horizontal ? startX : endX, horizontal ? endY : startY, bgColor());
-        graphics.fill(horizontal ? endX : x(), horizontal ? y() : endY, x() + w(), y() + h(), bgColor());
+        graphics.fill(x(), y(), horizontal ? startX : endX, horizontal ? endY : startY, bgColorInt());
+        graphics.fill(horizontal ? endX : x(), horizontal ? y() : endY, x() + w(), y() + h(), bgColorInt());
 
         // 主滚动条部分
         if (isInBounds(mouseX, mouseY) || isDragging) {
             // 高亮
-            graphics.fill(startX, startY, endX, endY, mainColor());
+            graphics.fill(startX, startY, endX, endY, mainColorInt());
         } else {
-            graphics.fill(startX, startY, endX, endY, new Color(mainColor()).toArgbWithAlphaMult(0.6));
+            graphics.fill(startX, startY, endX, endY, new Color(mainColorInt()).toArgbWithAlphaMult(0.6));
         }
     }
 }

@@ -10,8 +10,8 @@ import static org.creepebucket.creepebucketlib.Creepebucketlib.MODID;
 
 public record SimpleKvS2cPacket(String key, Object value) implements CustomPacketPayload {
 
-    public static final Type<SimpleKvS2cPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(MODID, "simple_kv_s2c"));
+    public static final CustomPacketPayload.Type<SimpleKvS2cPacket> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(MODID, "simple_kv_s2c"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SimpleKvS2cPacket> STREAM_CODEC = new StreamCodec<>() {
         @Override
@@ -33,3 +33,4 @@ public record SimpleKvS2cPacket(String key, Object value) implements CustomPacke
         return TYPE;
     }
 }
+
