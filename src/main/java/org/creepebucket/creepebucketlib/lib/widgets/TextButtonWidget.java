@@ -10,8 +10,7 @@ import org.creepebucket.creepebucketlib.lib.api.Widget;
 import org.creepebucket.creepebucketlib.lib.api.widgets.Lifecycle;
 import org.creepebucket.creepebucketlib.lib.ui.WidgetManager;
 
-
-import static org.creepebucket.creepebucketlib.lib.api.Coordinate.*;
+import static org.creepebucket.creepebucketlib.lib.api.Coordinate.fromCenter;
 
 public class TextButtonWidget extends RectangleButtonWidget implements Lifecycle {
     public Component text;
