@@ -110,25 +110,25 @@ public abstract class Widget {
                 renderable.render(graphics, mx, my, partialTick);
             }
 
-            // 检查动画过期/启动状态
-            var expiredAnimations = animations.stream().filter(Animation::isExpired).toList();
-            var startedAnimations = animations.stream().filter(Animation::isStarted).toList();
-
-            for (Animation animation : expiredAnimations) {
-                animation.onExpire(this);
-                animations.remove(animation);
-            }
-
-            for (Animation animation : startedAnimations) {
-                animation.onStart(this);
-            }
-
             // 平滑逻辑
             for (SmoothedValue value : smoothedValues) value.doStep(dt);
         }
 
         // 孩子的渲染逻辑
         if (enabled) for (Widget child : List.copyOf(children)) child.renderWidget(graphics, mx, my, partialTick, dt, isForeground);
+
+        // 检查动画过期/启动状态
+        var expiredAnimations = animations.stream().filter(Animation::isExpired).toList();
+        var startedAnimations = animations.stream().filter(Animation::isStarted).toList();
+
+        for (Animation animation : expiredAnimations) {
+            animation.onExpire(this);
+            animations.remove(animation);
+        }
+
+        for (Animation animation : startedAnimations) {
+            animation.onStart(this);
+        }
     }
 
     /**
